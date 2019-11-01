@@ -1,0 +1,44 @@
+{
+  "name": "certificate-network-academy",
+  "version": "1.0.0",
+  "client": {
+    "organization": "Academy",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        }
+      }
+    }
+  },
+  "organizations": {
+    "Academy": {
+      "mspid": "AcademyMSP",
+      "peers": ["peer0.academy.certificate.com"],
+      "certificateAuthorities": ["ca.academy.certificate.com"]
+    }
+  },
+  "peers": {
+    "peer0.academy.certificate.com": {
+      "url": "grpc://localhost:7051",
+      "tlsCACerts": {
+        "path": "crypto-config/peerOrganizations/academy.certificate.com/tlsca/tlsca.academy.certificate.com-cert.pem"
+      },
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.academy.certificate.com"
+      }
+    }
+  },
+  "certificateAuthorities": {
+    "ca.academy.certificate.com": {
+      "url": "http://localhost:7054",
+      "caName": "ca.academy.certificate.com",
+      "tlsCACerts": {
+        "path": "crypto-config/peerOrganizations/academy.certificate.com/tlsca/tlsca.academy.certificate.com-cert.pem"
+      },
+      "httpOptions": {
+        "verify": false
+      }
+    }
+  }
+}

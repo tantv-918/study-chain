@@ -1,0 +1,36 @@
+# Local build binaries
+node-cli/node-cli
+*.pyc
+/build/*
+/network/bin
+/network/docker-compose.yaml
+/network/channel-artifacts
+/network/crypto-config
+.idea
+*.iml
+.DS_Store
+tags
+.tags
+.vagrant/
+/build
+# Emacs backup files
+*~
+*#
+.#*
+# bddtest log files
+*.log
+# bddtest coverage files
+bddtests/coverage
+*.cov
+# Makefile dummy artifacts
+.*-dummy
+# go-carpet output files
+go-carpet-coverage*
+# make node-sdk copied files
+sdk/node/lib/protos/*
+# yarn.lock
+yarn.lock
+
+.nyc_output
+fabric-samples
+coverage/*

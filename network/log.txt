@@ -1,0 +1,1 @@
+./scripts/buildcontract.sh: line 41: peer: command not found

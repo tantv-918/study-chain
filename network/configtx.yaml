@@ -1,0 +1,168 @@
+Organizations:
+
+  - &OrdererOrg
+      Name: OrdererOrg
+
+      ID: OrdererMSP
+
+      MSPDir: crypto-config/ordererOrganizations/certificate.com/msp
+
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('OrdererMSP.member')"
+        Writers:
+          Type: Signature
+          Rule: "OR('OrdererMSP.member')"
+        Admins:
+          Type: Signature
+          Rule: "OR('OrdererMSP.admin')"
+
+  - &Academy
+      Name: AcademyMSP
+
+      ID: AcademyMSP
+
+      MSPDir: crypto-config/peerOrganizations/academy.certificate.com/msp
+
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('AcademyMSP.admin', 'AcademyMSP.peer', 'AcademyMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('AcademyMSP.admin', 'AcademyMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('AcademyMSP.admin')"
+
+      AnchorPeers:
+        - Host: peer0.academy.certificate.com
+          Port: 7051
+
+  - &Student
+      Name: StudentMSP
+
+      ID: StudentMSP
+
+      MSPDir: crypto-config/peerOrganizations/student.certificate.com/msp
+
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('StudentMSP.admin', 'StudentMSP.peer', 'StudentMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('StudentMSP.admin', 'StudentMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('StudentMSP.admin')"
+
+      AnchorPeers:
+        - Host: peer0.student.certificate.com
+          Port: 7051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V1_3: true
+
+  Orderer: &OrdererCapabilities
+    V1_1: true
+
+  Application: &ApplicationCapabilities
+    V1_3: true
+    V1_2: false
+    V1_1: false
+
+
+Application: &ApplicationDefaults
+
+  Organizations:
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+
+  OrdererType: solo
+
+  Addresses:
+    - orderer.certificate.com:7050
+
+  BatchTimeout: 2s
+
+  BatchSize:
+
+    MaxMessageCount: 10
+
+    AbsoluteMaxBytes: 99 MB
+
+    PreferredMaxBytes: 512 KB
+
+  Organizations:
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+Channel: &ChannelDefaults
+  Policies:
+    # Who may invoke the 'Deliver' API
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    # Who may invoke the 'Broadcast' API
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    # By default, who may modify elements at this config level
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+
+  TwoOrgsOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          - *Academy
+          - *Student
+  TwoOrgsChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Academy
+        - *Student
+      Capabilities:
+        <<: *ApplicationCapabilities

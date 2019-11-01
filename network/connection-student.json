@@ -1,0 +1,44 @@
+{
+  "name": "certificate-network-student",
+  "version": "1.0.0",
+  "client": {
+    "organization": "Student",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        }
+      }
+    }
+  },
+  "organizations": {
+    "Student": {
+      "mspid": "StudentMSP",
+      "peers": ["peer0.student.certificate.com"],
+      "certificateAuthorities": ["ca.student.certificate.com"]
+    }
+  },
+  "peers": {
+    "peer0.student.certificate.com": {
+      "url": "grpc://localhost:8051",
+      "tlsCACerts": {
+        "path": "crypto-config/peerOrganizations/student.certificate.com/tlsca/tlsca.student.certificate.com-cert.pem"
+      },
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.student.certificate.com"
+      }
+    }
+  },
+  "certificateAuthorities": {
+    "ca.student.certificate.com": {
+      "url": "http://localhost:8054",
+      "caName": "ca.student.certificate.com",
+      "tlsCACerts": {
+        "path": "crypto-config/peerOrganizations/student.certificate.com/tlsca/tlsca.student.certificate.com-cert.pem"
+      },
+      "httpOptions": {
+        "verify": false
+      }
+    }
+  }
+}
