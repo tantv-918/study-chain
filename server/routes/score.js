@@ -28,36 +28,40 @@ router.get(
         msg: 'Permission Denied'
       });
     }
+
     let identity = req.params.studentUsername;
 
-    User.findOne({ username: identity, role: USER_ROLES.STUDENT }, async (err, student) => {
-      if (err) {
-        return res.status(500).json({
+    try {
+      let student = await User.findOne({ username: identity, role: USER_ROLES.STUDENT });
+      let score = [req.params.subjectId, identity];
+
+      if (!student) {
+        return res.status(404).json({
           success: false,
-          msg: err
+          msg: 'student is not exists'
         });
       }
-      if (student) {
-        let score = [req.params.subjectId, identity];
-        const networkObj = await network.connectToNetwork(req.decoded.user);
-        const response = await network.query(networkObj, 'GetScoresBySubject', score);
-        if (!response.success) {
-          return res.status(500).json({
-            success: false,
-            msg: response.msg
-          });
-        }
-        return res.json({
-          success: true,
+
+      const networkObj = await network.connectToNetwork(req.decoded.user);
+      const response = await network.query(networkObj, 'GetScoresBySubject', score);
+
+      if (!response.success) {
+        return res.status(500).json({
+          success: false,
           msg: response.msg
         });
       }
 
-      return res.status(404).json({
-        success: false,
-        msg: 'student is not exists'
+      return res.json({
+        success: true,
+        msg: response.msg
       });
-    });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        msg: 'Internal Server Error'
+      });
+    }
   }
 );
 
@@ -68,6 +72,7 @@ router.get('/all', async (req, res) => {
       msg: 'Permission Denied'
     });
   }
+
   const networkObj = await network.connectToNetwork(req.decoded.user);
 
   const response = await network.query(networkObj, 'GetAllScores');

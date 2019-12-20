@@ -34,3 +34,4 @@ yarn.lock
 .nyc_output
 fabric-samples
 coverage/*
+/bin

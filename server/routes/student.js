@@ -10,8 +10,8 @@ router.get('/all', async (req, res) => {
       msg: 'Permission Denied'
     });
   }
-  const networkObj = await network.connectToNetwork(req.decoded.user);
 
+  const networkObj = await network.connectToNetwork(req.decoded.user);
   const response = await network.query(networkObj, 'GetAllStudents');
 
   if (!response.success) {
@@ -33,18 +33,22 @@ router.get('/:username/subjects', async (req, res, next) => {
       msg: 'Permission Denied'
     });
   }
+
   let identity = req.params.username;
-  await User.findOne({ username: identity, role: USER_ROLES.STUDENT }, async (err, student) => {
-    if (err) {
-      return res.status(500).json({ success: false, msg: 'error query subjects of student' });
-    }
+
+  try {
+    let student = await User.findOne({ username: identity, role: USER_ROLES.STUDENT });
 
     if (!student) {
-      return res.status(404).json({ success: false, msg: 'student is not exists' });
+      return res.status(404).json({
+        success: false,
+        msg: 'student is not exists'
+      });
     }
 
     const networkObj = await network.connectToNetwork(req.decoded.user);
     let subjectsByStudent = await network.query(networkObj, 'GetSubjectsByStudent', identity);
+
     if (!subjectsByStudent.success) {
       return res.status(500).json({
         success: false,
@@ -55,7 +59,12 @@ router.get('/:username/subjects', async (req, res, next) => {
       success: true,
       subjects: JSON.parse(subjectsByStudent.msg)
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: 'Internal Server Error'
+    });
+  }
 });
 
 router.get('/:username/scores', async (req, res, next) => {
@@ -66,17 +75,20 @@ router.get('/:username/scores', async (req, res, next) => {
     });
   }
   let identity = req.params.username;
-  await User.findOne({ username: identity, role: USER_ROLES.STUDENT }, async (err, student) => {
-    if (err) {
-      return res.status(500).json({ success: false, msg: 'error query scores of student' });
-    }
+
+  try {
+    let student = await User.findOne({ username: identity, role: USER_ROLES.STUDENT });
 
     if (!student) {
-      return res.status(404).json({ success: false, msg: 'student is not exists' });
+      return res.status(404).json({
+        success: false,
+        msg: 'student is not exists'
+      });
     }
 
     const networkObj = await network.connectToNetwork(req.decoded.user);
     let scoresByStudent = await network.query(networkObj, 'GetScoresByStudent', identity);
+
     if (!scoresByStudent.success) {
       return res.status(500).json({
         success: false,
@@ -87,7 +99,12 @@ router.get('/:username/scores', async (req, res, next) => {
       success: true,
       scores: JSON.parse(scoresByStudent.msg)
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: 'Internal Server Error'
+    });
+  }
 });
 
 router.get('/:username/certificates', async (req, res, next) => {
@@ -98,13 +115,15 @@ router.get('/:username/certificates', async (req, res, next) => {
     });
   }
   let identity = req.params.username;
-  await User.findOne({ username: identity, role: USER_ROLES.STUDENT }, async (err, student) => {
-    if (err) {
-      return res.status(500).json({ success: false, msg: 'error query certificates of student' });
-    }
+
+  try {
+    let student = await User.findOne({ username: identity, role: USER_ROLES.STUDENT });
 
     if (!student) {
-      return res.status(404).json({ success: false, msg: 'student is not exists' });
+      return res.status(404).json({
+        success: false,
+        msg: 'student is not exists'
+      });
     }
 
     const networkObj = await network.connectToNetwork(req.decoded.user);
@@ -123,7 +142,12 @@ router.get('/:username/certificates', async (req, res, next) => {
       success: true,
       certificates: JSON.parse(certificatesByStudent.msg)
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: 'Internal Server Error'
+    });
+  }
 });
 
 module.exports = router;

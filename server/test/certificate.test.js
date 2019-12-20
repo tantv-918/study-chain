@@ -79,18 +79,6 @@ describe('Route : /certificate', () => {
           done();
         });
     });
-
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get('/certificate/create')
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
   });
 
   describe('#POST /certificate/create ', () => {
@@ -160,22 +148,6 @@ describe('Route : /certificate', () => {
           expect(res.status).equal(403);
           expect(res.body.success).equal(false);
           expect(res.body.msg).equal('Permission Denied');
-          done();
-        });
-    });
-
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .post('/certificate/create')
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .send({
-          subjectId: '7',
-          studentUsername: 'tantrinh'
-        })
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
           done();
         });
     });
@@ -373,7 +345,7 @@ describe('Route : /certificate', () => {
     });
 
     it('should get data success', (done) => {
-      findOneStub.yields(undefined, {
+      findOneStub.returns({
         certificateID: '5d9ac9e4fc93231bc694cb4c',
         SubjectID: 'Blockchain',
         username: 'tantv',
@@ -401,7 +373,7 @@ describe('Route : /certificate', () => {
     });
 
     it('certificate is not exists', (done) => {
-      findOneStub.yields(undefined, null);
+      findOneStub.returns(undefined, null);
       request(app)
         .get(`/certificate/${certId}`)
         .then((res) => {
@@ -494,17 +466,6 @@ describe('Route : /certificate', () => {
           done();
         });
     });
-    it('error check jwt', (done) => {
-      findOneUserStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/certificate/all`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
 
     it('error query all certificates', (done) => {
       findOneUserStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
@@ -556,15 +517,9 @@ describe('Route : /certificate', () => {
     });
 
     it('success verify certificate', (done) => {
-      findOneUserStub
-        .onFirstCall()
-        .yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
+      findOneUserStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
 
-      findOneUserStub
-        .onSecondCall()
-        .yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
-
-      findOneCertStub.yields(undefined, {
+      findOneCertStub.returns({
         certificateID: '5d9ac9e4fc93231bc694cb4c',
         SubjectID: 'Blockchain',
         username: 'hoangdd',
@@ -590,23 +545,17 @@ describe('Route : /certificate', () => {
         });
     });
 
-    it('do not success verify because error check JWT', (done) => {
-      findOneUserStub.yields({ error: 'err' }, null);
-      request(app)
-        .get(`/certificate/${certID}/verify`)
-        .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
-        .then((res) => {
-          expect(res.status).equal(403);
-          expect(res.body.success).equal(false);
-          expect(res.body.message).equal('Error find username');
-          done();
-        });
-    });
+    it('do not success verify because server error', (done) => {
+      findOneCertStub.throws();
 
-    it('do not success verify because error findOne certificate in database', (done) => {
-      findOneUserStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
-
-      findOneCertStub.yields('error to find cert', null);
+      verify.returns({
+        success: true,
+        msg: {
+          certificateID: '5d9ac9e4fc93231bc694cb4c',
+          SubjectID: 'Blockchain',
+          username: 'hoangdd'
+        }
+      });
 
       request(app)
         .get(`/certificate/${certID}/verify`)
@@ -614,15 +563,38 @@ describe('Route : /certificate', () => {
         .then((res) => {
           expect(res.status).equal(500);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('error to find cert');
+          expect(res.body.msg).equal('Internal Server Error');
+          done();
+        });
+    });
+
+    it('do not success verify because chaincode response error', (done) => {
+      findOneUserStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
+
+      findOneCertStub.returns({
+        certificateID: '5d9ac9e4fc93231bc694cb4c',
+        SubjectID: 'Blockchain',
+        username: 'hoangdd',
+        issueDate: 'Mon Oct 07 2019 00:07:17 GMT+0700 (Indochina Time)'
+      });
+
+      verify.returns({
+        success: false,
+        msg: 'error'
+      });
+
+      request(app)
+        .get(`/certificate/${certID}/verify`)
+        .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
+        .then((res) => {
+          expect(res.status).equal(500);
+          expect(res.body.success).equal(false);
           done();
         });
     });
 
     it('do not success verify because error certificate is not exists in database', (done) => {
-      findOneUserStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
-
-      findOneCertStub.yields(undefined, null);
+      findOneCertStub.returns(null);
 
       request(app)
         .get(`/certificate/${certID}/verify`)

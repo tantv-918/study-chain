@@ -409,15 +409,15 @@ func QueryCertificate(stub shim.ChaincodeStubInterface, args []string) sc.Respon
 
 func VerifyCertificate(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	// MSPID, err := cid.GetMSPID(stub)
+	MSPID, err := cid.GetMSPID(stub)
 
-	// if err != nil {
-	// 	shim.Error("Error - cid.GetMSPID()")
-	// }
+	if err != nil {
+		shim.Error("Error - cid.GetMSPID()")
+	}
 
-	// if MSPID != "StudentMSP" && MSPID == "AcademyMSP" {
-	// 	shim.Error("WHO ARE YOU ?")
-	// }
+	if MSPID != "StudentMSP" && MSPID == "AcademyMSP" {
+		shim.Error("WHO ARE YOU ?")
+	}
 
 	if len(args) != 3 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
@@ -836,7 +836,7 @@ func GetCertificatesByStudent(stub shim.ChaincodeStubInterface, args []string) s
 
 	StudentUsername := args[0]
 
-	_, err := getStudent(stub, "Student-" + StudentUsername)
+	_, err := getStudent(stub, "Student-"+StudentUsername)
 
 	if err != nil {
 		return shim.Error("Student dose not exist - " + StudentUsername)
@@ -886,7 +886,7 @@ func GetScoresByStudent(stub shim.ChaincodeStubInterface, args []string) sc.Resp
 
 	StudentUsername := args[0]
 
-	_, err := getStudent(stub, "Student-" + StudentUsername)
+	_, err := getStudent(stub, "Student-"+StudentUsername)
 
 	if err != nil {
 		return shim.Error("Student dose not exist - " + StudentUsername)
@@ -997,7 +997,7 @@ func GetScoresBySubjectOfTeacher(stub shim.ChaincodeStubInterface, args []string
 		return shim.Error("WHO ARE YOU ?")
 	}
 
-	_, err = getTeacher(stub, "Teacher-" + TeacherUsername)
+	_, err = getTeacher(stub, "Teacher-"+TeacherUsername)
 
 	if err != nil {
 		return shim.Error("Error - Teacher Does not exist !")
@@ -1005,13 +1005,13 @@ func GetScoresBySubjectOfTeacher(stub shim.ChaincodeStubInterface, args []string
 
 	SubjectID := args[0]
 
-	subject, err := getSubject(stub, "Subject-" + SubjectID)
+	subject, err := getSubject(stub, "Subject-"+SubjectID)
 
 	if err != nil {
 		return shim.Error("Subject dose not exist - " + SubjectID)
 	}
 
-	if (subject.TeacherUsername != TeacherUsername){
+	if subject.TeacherUsername != TeacherUsername {
 		return shim.Error("WHO ARE YOU ?")
 	}
 
@@ -1030,7 +1030,7 @@ func GetScoresBySubjectOfTeacher(stub shim.ChaincodeStubInterface, args []string
 			return shim.Success(nil)
 		}
 
-		score:= Score{}
+		score := Score{}
 		json.Unmarshal(record.Value, &score)
 		if score.SubjectID == SubjectID {
 			tlist = append(tlist, score)
@@ -1045,7 +1045,6 @@ func GetScoresBySubjectOfTeacher(stub shim.ChaincodeStubInterface, args []string
 
 	return shim.Success(jsonRow)
 }
-
 
 func GetStudentsBySubject(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 	// MSPID, err := cid.GetMSPID(stub)
@@ -1105,7 +1104,7 @@ func GetCertificatesBySubject(stub shim.ChaincodeStubInterface, args []string) s
 
 	SubjectID := args[0]
 
-	_, err := getSubject(stub, "Subject-" + SubjectID)
+	_, err := getSubject(stub, "Subject-"+SubjectID)
 
 	if err != nil {
 		return shim.Error("Subject dose not exist - " + SubjectID)
@@ -1126,7 +1125,7 @@ func GetCertificatesBySubject(stub shim.ChaincodeStubInterface, args []string) s
 			return shim.Success(nil)
 		}
 
-		certificate:= Certificate{}
+		certificate := Certificate{}
 		json.Unmarshal(record.Value, &certificate)
 		if certificate.SubjectID == SubjectID {
 			tlist = append(tlist, certificate)
@@ -1155,7 +1154,7 @@ func GetScoresBySubject(stub shim.ChaincodeStubInterface, args []string) sc.Resp
 
 	SubjectID := args[0]
 
-	_, err := getSubject(stub, "Subject-" + SubjectID)
+	_, err := getSubject(stub, "Subject-"+SubjectID)
 
 	if err != nil {
 		return shim.Error("Subject dose not exist - " + SubjectID)
@@ -1176,7 +1175,7 @@ func GetScoresBySubject(stub shim.ChaincodeStubInterface, args []string) sc.Resp
 			return shim.Success(nil)
 		}
 
-		score:= Score{}
+		score := Score{}
 		json.Unmarshal(record.Value, &score)
 		if score.SubjectID == SubjectID {
 			tlist = append(tlist, score)

@@ -29,7 +29,6 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all student with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .get('/account/student/all')
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -42,7 +41,6 @@ describe('GET /account/student', () => {
     });
 
     it('success query all student with admin academy', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
       let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
 
@@ -61,7 +59,6 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all student with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get('/account/student/all')
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -74,7 +71,6 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all student with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get('/account/student/all')
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -82,18 +78,6 @@ describe('GET /account/student', () => {
           expect(res.status).equal(403);
           expect(res.body.success).equal(false);
           expect(res.body.msg).equal('Permission Denied');
-          done();
-        });
-    });
-
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get('/account/student/all')
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
           done();
         });
     });
@@ -116,8 +100,8 @@ describe('GET /account/student', () => {
       query.restore();
       findOneStub.restore();
     });
+
     it('do not success all subjects of student with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .get(`/account/student/${username}/subjects`)
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -130,7 +114,7 @@ describe('GET /account/student', () => {
     });
 
     it('success query all subjects of student with admin academy', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd' });
       connect.returns({ error: null });
       let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
 
@@ -149,7 +133,6 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all subjects of student with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get(`/account/student/${username}/subjects`)
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -162,7 +145,6 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all subjects of student with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get(`/account/student/${username}/subjects`)
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -174,20 +156,8 @@ describe('GET /account/student', () => {
         });
     });
 
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/account/student/${username}/subjects`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
-
     it('success query all subjects of student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd' });
       connect.returns({ error: null });
       let data = JSON.stringify(
         {
@@ -219,12 +189,7 @@ describe('GET /account/student', () => {
     });
 
     it('student username is not exists', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields(undefined, null);
+      findOneStub.returns(null);
 
       connect.returns({ error: null });
 
@@ -240,12 +205,12 @@ describe('GET /account/student', () => {
     });
 
     it('error query student in database', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
+      findOneStub.returns({ username: 'trinhvantan' });
 
-      findOneStub.onSecondCall().yields({ error: 'failed to query database' }, null);
+      query.returns({
+        success: false,
+        msg: 'error chaincode'
+      });
 
       request(app)
         .get(`/account/student/${username}/subjects`)
@@ -253,7 +218,20 @@ describe('GET /account/student', () => {
         .then((res) => {
           expect(res.status).equal(500);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('error query subjects of student');
+          done();
+        });
+    });
+
+    it('error because chaincode invoke error', (done) => {
+      findOneStub.throws();
+
+      request(app)
+        .get(`/account/student/${username}/subjects`)
+        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
+        .then((res) => {
+          expect(res.status).equal(500);
+          expect(res.body.success).equal(false);
+          expect(res.body.msg).equal('Internal Server Error');
           done();
         });
     });
@@ -277,7 +255,7 @@ describe('GET /account/student', () => {
       findOneStub.restore();
     });
     it('do not success query all certificates of student with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .get(`/account/student/${username}/certificates`)
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -290,7 +268,7 @@ describe('GET /account/student', () => {
     });
 
     it('success query all certificates of student with admin academy', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
       let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
 
@@ -309,7 +287,7 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all certificates of student with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get(`/account/student/${username}/certificates`)
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -322,7 +300,7 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all certificates of student with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get(`/account/student/${username}/certificates`)
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -334,20 +312,8 @@ describe('GET /account/student', () => {
         });
     });
 
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/account/student/${username}/certificates`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
-
     it('success query all certificates of student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
 
       let data = JSON.stringify(
@@ -381,12 +347,7 @@ describe('GET /account/student', () => {
     });
 
     it('student username is not exists', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields(undefined, null);
+      findOneStub.returns(null);
 
       connect.returns({ error: null });
 
@@ -402,12 +363,7 @@ describe('GET /account/student', () => {
     });
 
     it('error query student in database', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields({ error: 'failed to query database' }, null);
+      findOneStub.throws();
 
       request(app)
         .get(`/account/student/${username}/certificates`)
@@ -415,7 +371,7 @@ describe('GET /account/student', () => {
         .then((res) => {
           expect(res.status).equal(500);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('error query certificates of student');
+          expect(res.body.msg).equal('Internal Server Error');
           done();
         });
     });
@@ -452,7 +408,7 @@ describe('GET /account/student', () => {
     });
 
     it('success query all scores of student with admin academy', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
       let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
 
@@ -471,7 +427,7 @@ describe('GET /account/student', () => {
     });
 
     it('do not success query all scores of student with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get(`/account/student/${username}/scores`)
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -496,20 +452,8 @@ describe('GET /account/student', () => {
         });
     });
 
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/account/student/${username}/scores`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
-
     it('success query all subjects of student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
 
       let data = JSON.stringify(
@@ -543,12 +487,7 @@ describe('GET /account/student', () => {
     });
 
     it('student username is not exists', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields(undefined, null);
+      findOneStub.returns(null);
 
       connect.returns({ error: null });
 
@@ -564,12 +503,7 @@ describe('GET /account/student', () => {
     });
 
     it('error query student in database', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields({ error: 'failed to query database' }, null);
+      findOneStub.returns({ error: 'failed to query database' }, null);
 
       request(app)
         .get(`/account/student/${username}/scores`)
@@ -577,7 +511,7 @@ describe('GET /account/student', () => {
         .then((res) => {
           expect(res.status).equal(500);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('error query scores of student');
+          expect(res.body.msg).equal('Internal Server Error');
           done();
         });
     });

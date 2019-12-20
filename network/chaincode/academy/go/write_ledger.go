@@ -13,15 +13,15 @@ import (
 
 func CreateStudent(stub shim.ChaincodeStubInterface, args []string) sc.Response {
 
-	MSPID, err := cid.GetMSPID(stub)
+	// MSPID, err := cid.GetMSPID(stub)
 
-	if err != nil {
-		return shim.Error("Error - cide.GetMSPID()")
-	}
+	// if err != nil {
+	// 	return shim.Error("Error - cide.GetMSPID()")
+	// }
 
-	if MSPID != "StudentMSP" {
-		return shim.Error("WHO ARE YOU")
-	}
+	// if MSPID != "StudentMSP" {
+	// 	return shim.Error("WHO ARE YOU")
+	// }
 
 	if len(args) != 2 {
 		return shim.Error("Incorrect number of arguments. Expecting 2")

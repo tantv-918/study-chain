@@ -42,8 +42,13 @@ async function main() {
 
     // Create a new CA client for interacting with the CA.
     const caInfo = ccp.certificateAuthorities[`ca.${orgMSP}.certificate.com`];
-    const caTLSCACertsPath = path.resolve(__dirname, '../..', 'network', caInfo.tlsCACerts.path);
-    const caTLSCACerts = fs.readFileSync(caTLSCACertsPath);
+    // const caTLSCACertsPath = path.resolve(
+    //   __dirname,
+    //   '../..',
+    //   'network',
+    //   caInfo.tlsCACerts.path
+    // );
+    const caTLSCACerts = caInfo.tlsCACerts.pem;
     const ca = new FabricCAServices(
       caInfo.url,
       { trustedRoots: caTLSCACerts, verify: false },
@@ -80,26 +85,25 @@ async function main() {
       });
     }
 
-    await user.save(async (err, user) => {
-      if (err) throw err;
-      if (user) {
-        // Enroll the admin user, and import the new identity into the wallet.
-        const enrollment = await ca.enroll({
-          enrollmentID: 'admin',
-          enrollmentSecret: 'adminpw'
-        });
-        const identity = await X509WalletMixin.createIdentity(
-          `${nameMSP}MSP`,
-          enrollment.certificate,
-          enrollment.key.toBytes()
-        );
-        await wallet.import(user.username, identity);
-        console.log(
-          `Successfully enrolled admin user ${user.username} and imported it into the wallet-${orgMSP}`
-        );
-        process.exit(0);
-      }
-    });
+    let userSaved = await user.save();
+
+    if (userSaved) {
+      // Enroll the admin user, and import the new identity into the wallet.
+      const enrollment = await ca.enroll({
+        enrollmentID: 'admin',
+        enrollmentSecret: 'adminpw'
+      });
+      const identity = await X509WalletMixin.createIdentity(
+        `${nameMSP}MSP`,
+        enrollment.certificate,
+        enrollment.key.toBytes()
+      );
+      await wallet.import(user.username, identity);
+      console.log(
+        `Successfully enrolled admin user ${user.username} and imported it into the wallet-${orgMSP}`
+      );
+      process.exit(0);
+    }
   } catch (error) {
     console.error(`Failed to enroll admin user "admin": ${error}`);
     process.exit(1);

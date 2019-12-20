@@ -89,32 +89,39 @@ router.post(
         msg: 'Permission Denied'
       });
     }
-    User.findOne(
-      { username: req.body.teacherusername, role: USER_ROLES.TEACHER },
-      async (err, teacher) => {
-        if (err) return res.status(500).json({ success: false, msg: 'error query teacher' });
-        if (teacher) {
-          const networkObj = await network.connectToNetwork(req.decoded.user);
-          const response = await network.registerTeacherForSubject(
-            networkObj,
-            req.body.subjectId,
-            req.body.teacherusername
-          );
-          if (!response.success) {
-            return res.status(500).json({
-              success: false,
-              msg: response.msg
-            });
-          }
-          let subjects = await network.query(networkObj, 'GetSubjectsByTeacher', teacher.username);
-          return res.json({
-            success: true,
-            msg: response.msg,
-            subjects: JSON.parse(subjects.msg)
+
+    try {
+      let teacher = await User.findOne({
+        username: req.body.teacherusername,
+        role: USER_ROLES.TEACHER
+      });
+
+      if (teacher) {
+        const networkObj = await network.connectToNetwork(req.decoded.user);
+        const response = await network.registerTeacherForSubject(
+          networkObj,
+          req.body.subjectId,
+          req.body.teacherusername
+        );
+        if (!response.success) {
+          return res.status(500).json({
+            success: false,
+            msg: response.msg
           });
         }
+        let subjects = await network.query(networkObj, 'GetSubjectsByTeacher', teacher.username);
+        return res.json({
+          success: true,
+          msg: response.msg,
+          subjects: JSON.parse(subjects.msg)
+        });
       }
-    );
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        msg: 'Internal Server Error'
+      });
+    }
   }
 );
 
@@ -164,12 +171,14 @@ router.get('/:subjectId', async (req, res, next) => {
   const subjectID = req.params.subjectId;
   const networkObj = await network.connectToNetwork(req.decoded.user);
   const response = await network.query(networkObj, 'QuerySubject', subjectID);
+
   if (!response.success) {
     return res.status(500).json({
       success: false,
       msg: response.msg.toString()
     });
   }
+
   return res.json({
     success: true,
     subject: JSON.parse(response.msg)
