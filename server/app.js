@@ -4,33 +4,19 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const checkJWT = require('./middlewares/check-jwt');
+
 const app = express();
 
 require('dotenv').config();
 
-// API auth
 const authRoutes = require('./routes/auth');
-
-// API teacher
 const teacherRoutes = require('./routes/teacher');
-
-// API Subject
 const subjectRoutes = require('./routes/subject');
-
 const certificateRoutes = require('./routes/certificate');
-
-// API student
 const studentRoutes = require('./routes/student');
-
-//API score
-
 const scoreRoutes = require('./routes/score');
-
-// API cert
-//const certRouter = require('./routes/cert');
-
-// API me
 const meRoutes = require('./routes/me');
 
 // Connect database
@@ -43,20 +29,15 @@ mongoose.connect(
 );
 mongoose.set('useCreateIndex', true);
 
+// security with helmet
+app.use(helmet());
+
 // show log
 app.use(logger('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-app.use(
-  require('express-session')({
-    secret: process.env.EXPRESS_SESSION,
-    resave: false,
-    saveUninitialized: false
-  })
-);
 
 // set up cors to allow us to accept requests from our client
 app.use(

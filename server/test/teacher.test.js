@@ -29,7 +29,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query all teacher with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
 
       request(app)
         .get('/account/teacher/all')
@@ -43,7 +43,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('success query all teacher with admin academy', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_ACADEMY });
       connect.returns({ error: null });
       let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
 
@@ -62,7 +62,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query all teacher with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get('/account/teacher/all')
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -75,25 +75,13 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query all teacher with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get('/account/teacher/all')
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
         .then((res) => {
           expect(res.body.success).equal(false);
           expect(res.body.msg).equal('Permission Denied');
-          expect(res.status).equal(403);
-          done();
-        });
-    });
-
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get('/account/teacher/all')
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
           expect(res.status).equal(403);
           done();
         });
@@ -121,7 +109,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('should fail because the username already exists.', (done) => {
-      findOneStub.yields(undefined, {
+      findOneStub.returns({
         username: 'thienthangaycanh',
         fullname: 'Tan Trinh'
       });
@@ -143,7 +131,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query all teacher with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .post('/account/teacher/create')
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -159,13 +147,37 @@ describe('Route /account/teacher', () => {
         });
     });
 
-    it('success query teacher with admin academy', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
+    it('do not success becuse req.body empty', (done) => {
+      findOneStub.returns(null);
+      connect.returns({ error: null });
+
+      registerTeacherStub.returns({
+        success: true,
+        msg: 'Register success!'
       });
 
-      findOneStub.onSecondCall().yields(undefined, null);
+      let data = JSON.stringify({ username: 'tantv' }, { username: 'nghianv' });
+
+      query.returns({
+        success: true,
+        msg: data
+      });
+
+      request(app)
+        .post('/account/teacher/create')
+        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
+        .send({
+          username: '',
+          fullname: 'Do Duc Hoang'
+        })
+        .then((res) => {
+          expect(res.status).equal(422);
+          done();
+        });
+    });
+
+    it('success query teacher with admin academy', (done) => {
+      findOneStub.returns(null);
       connect.returns({ error: null });
 
       registerTeacherStub.returns({
@@ -195,7 +207,6 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .post('/account/teacher/create')
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -212,7 +223,6 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .post('/account/teacher/create')
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -227,25 +237,9 @@ describe('Route /account/teacher', () => {
           done();
         });
     });
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .post('/account/teacher/create')
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
 
     it('error when query teacher username', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields({ error: 'err' }, null);
+      findOneStub.throws();
       connect.returns({ error: null });
       request(app)
         .post('/account/teacher/create')
@@ -257,20 +251,13 @@ describe('Route /account/teacher', () => {
         .then((res) => {
           expect(res.status).equal(500);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('error query teacher');
+          expect(res.body.msg).equal('Internal Server Error');
           done();
         });
     });
 
     it('teacher username is exist', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub
-        .onSecondCall()
-        .yields(undefined, { username: 'thienthangaycanhh', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'thienthangaycanhh', role: USER_ROLES.TEACHER });
 
       connect.returns({ error: null });
 
@@ -290,12 +277,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('error when call function registerTeacherOnBlockchain', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields(undefined, null);
+      findOneStub.returns(null);
 
       connect.returns({ error: null });
 
@@ -319,12 +301,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('error when call function getAllTeacher', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields(undefined, null);
+      findOneStub.returns(undefined, null);
 
       connect.returns({ error: null });
 
@@ -375,7 +352,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .get(`/account/teacher/${username}`)
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -388,7 +365,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get(`/account/teacher/${username}`)
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -401,7 +378,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get(`/account/teacher/${username}`)
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -412,25 +389,9 @@ describe('Route /account/teacher', () => {
           done();
         });
     });
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/account/teacher/${username}`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
-          expect(res.status).equal(403);
-          done();
-        });
-    });
 
     it('error when query teacher', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub.onSecondCall().yields({ error: 'err' }, null);
+      findOneStub.throws();
       connect.returns({ error: null });
       request(app)
         .get(`/account/teacher/${username}`)
@@ -442,26 +403,21 @@ describe('Route /account/teacher', () => {
         });
     });
 
-    it('teacher username is not exists', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
+    // it.only('teacher username is not exists', (done) => {
+    //   findOneStub.returns(null);
 
-      findOneStub.onSecondCall().yields(undefined, null);
+    //   connect.returns({ error: null });
 
-      connect.returns({ error: null });
-
-      request(app)
-        .get(`/account/teacher/${username}`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.status).equal(404);
-          expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('teacher is not exists');
-          done();
-        });
-    });
+    //   request(app)
+    //     .get(`/account/teacher/${username}`)
+    //     .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
+    //     .then((res) => {
+    //       expect(res.status).equal(404);
+    //       expect(res.body.success).equal(false);
+    //       expect(res.body.msg).equal('teacher is not exists');
+    //       done();
+    //     });
+    // });
 
     it('error when call function QueryTeacher', (done) => {
       findOneStub.onFirstCall().yields(undefined, {
@@ -537,14 +493,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('success query subject of teacher', (done) => {
-      findOneStub.onFirstCall().yields(undefined, {
-        username: 'hoangdd',
-        role: USER_ROLES.ADMIN_ACADEMY
-      });
-
-      findOneStub
-        .onSecondCall()
-        .yields(undefined, { username: 'tantrinh', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'tantrinh', role: USER_ROLES.TEACHER });
 
       connect.returns({ error: null });
 
@@ -599,7 +548,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query all teacher with admin student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.ADMIN_STUDENT });
       request(app)
         .get(`/account/teacher/${username}/subjects`)
         .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -612,7 +561,7 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with teacher', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.TEACHER });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.TEACHER });
       request(app)
         .get(`/account/teacher/${username}/subjects`)
         .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
@@ -625,24 +574,13 @@ describe('Route /account/teacher', () => {
     });
 
     it('do not success query teacher with student', (done) => {
-      findOneStub.yields(undefined, { username: 'hoangdd', role: USER_ROLES.STUDENT });
+      findOneStub.returns({ username: 'hoangdd', role: USER_ROLES.STUDENT });
       request(app)
         .get(`/account/teacher/${username}/subjects`)
         .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
         .then((res) => {
           expect(res.body.success).equal(false);
           expect(res.body.msg).equal('Permission Denied');
-          expect(res.status).equal(403);
-          done();
-        });
-    });
-    it('error check jwt', (done) => {
-      findOneStub.yields({ error: 'can not check jwt' }, undefined);
-      request(app)
-        .get(`/account/teacher/${username}/subjects`)
-        .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
-        .then((res) => {
-          expect(res.body.success).equal(false);
           expect(res.status).equal(403);
           done();
         });

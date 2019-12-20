@@ -149,13 +149,9 @@ router.get('/all', checkJWT, async (req, res) => {
 
 router.get('/:certId', async (req, res) => {
   var certId = req.params.certId;
-  await Certificate.findOne({ certificateID: certId }, async (err, ceritificate) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        msg: err
-      });
-    }
+
+  try {
+    let ceritificate = await Certificate.findOne({ certificateID: certId });
 
     if (!ceritificate) {
       return res.status(404).json({
@@ -168,19 +164,20 @@ router.get('/:certId', async (req, res) => {
       success: true,
       msg: ceritificate
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: 'Internal Server Error'
+    });
+  }
 });
 
 router.get('/:certId/verify', checkJWT, async (req, res) => {
   let user = req.decoded.user;
-  var certId = req.params.certId;
-  Certificate.findOne({ certificateID: certId }, async (err, ceritificate) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        msg: err
-      });
-    }
+  let certId = req.params.certId;
+
+  try {
+    let ceritificate = await Certificate.findOne({ certificateID: certId });
 
     if (!ceritificate) {
       return res.status(404).json({
@@ -202,7 +199,12 @@ router.get('/:certId/verify', checkJWT, async (req, res) => {
       success: true,
       msg: response.msg.toString()
     });
-  });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      msg: 'Internal Server Error'
+    });
+  }
 });
 
 module.exports = router;

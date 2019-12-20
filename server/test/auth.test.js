@@ -42,7 +42,7 @@ describe('Route : /auth', () => {
     });
 
     it('should register success', (done) => {
-      findOneUserStub.yields(undefined, null);
+      findOneUserStub.returns(null);
       registerStudentStub.returns({
         success: true,
         msg: 'Register success!'
@@ -56,6 +56,7 @@ describe('Route : /auth', () => {
           fullname: 'Hoang Do'
         })
         .then((res) => {
+          console.log(res.body);
           expect(res.status).equal(200);
           done();
         });
@@ -63,7 +64,7 @@ describe('Route : /auth', () => {
 
     it('shoud fail because the username already exists.', (done) => {
       // found a record username: 'trailang98',
-      findOneUserStub.yields(undefined, {
+      findOneUserStub.returns({
         username: 'hoangdd',
         password: '1234567'
       });
@@ -76,14 +77,15 @@ describe('Route : /auth', () => {
           fullname: 'Hoang Do'
         })
         .then((res) => {
+          expect(res.status).equal(409);
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('Account is exits');
+          expect(res.body.msg).equal('Account already exist');
           done();
         });
     });
 
     it('shoud fail because findOne error.', (done) => {
-      findOneUserStub.yields({ error: 'cannot connect db' }, null);
+      findOneUserStub.returns(null);
 
       request(app)
         .post('/auth/register')
@@ -100,7 +102,7 @@ describe('Route : /auth', () => {
     });
 
     it('shoud fail because error when call registerStudentOnBlockChain function.', (done) => {
-      findOneUserStub.yields(undefined, null);
+      findOneUserStub.returns(null);
       registerStudentStub.returns({
         success: false,
         msg: 'cannot call chaincode'
@@ -115,7 +117,7 @@ describe('Route : /auth', () => {
         })
         .then((res) => {
           expect(res.body.success).equal(false);
-          expect(res.body.msg).equal('cannot call chaincode');
+          expect(res.body.msg).equal('Network Error');
           done();
         });
     });
@@ -173,8 +175,8 @@ describe('Route : /auth', () => {
         });
     });
 
-    it('shoud fail because can not query database', (done) => {
-      findOneUserStub.yields({ error: 'failed to query document' }, null);
+    it('shoud fail because account is not exist', (done) => {
+      findOneUserStub.returns(null);
 
       request(app)
         .post('/auth/login')
@@ -183,30 +185,15 @@ describe('Route : /auth', () => {
           password: '1234567'
         })
         .then((res) => {
-          expect(res.status).equal(500);
+          expect(res.status).equal(404);
           expect(res.body.success).equal(false);
-          done();
-        });
-    });
-
-    it('shoud fail because can not find username', (done) => {
-      findOneUserStub.yields(undefined, null);
-
-      request(app)
-        .post('/auth/login')
-        .send({
-          username: 'hoangddhaycuphoc',
-          password: '1234567'
-        })
-        .then((res) => {
-          expect(res.status).equal(200);
-          expect(res.body.msg).equal('Username or Password incorrect');
+          expect(res.body.msg).equal('Account is not exist');
           done();
         });
     });
 
     it('shoud fail because wrong password', (done) => {
-      findOneUserStub.yields(undefined, {
+      findOneUserStub.returns({
         username: 'hoangdd',
         password: '654321',
         name: 'hoang'
@@ -219,14 +206,14 @@ describe('Route : /auth', () => {
           password: '78945612'
         })
         .then((res) => {
-          expect(res.status).equal(200);
+          expect(res.status).equal(403);
           expect(res.body.msg).equal('Username or Password incorrect');
           done();
         });
     });
 
     it('should login success', (done) => {
-      findOneUserStub.yields(undefined, {
+      findOneUserStub.returns({
         username: 'hoangdd',
         password: '$2a$10$hqZtIwFcl8SLaUbxkuPOEeKqvTknWFodjVaYVdXoZ0EeIb3SjT/dG',
         name: 'alibaba',
@@ -245,7 +232,21 @@ describe('Route : /auth', () => {
           done();
         });
     });
-  });
 
-  //describe('# GET :/auth/google', () => {});
+    it('error server when login', (done) => {
+      findOneUserStub.throws();
+
+      request(app)
+        .post('/auth/login')
+        .send({
+          username: 'hoangdd',
+          password: '654321'
+        })
+        .then((res) => {
+          expect(res.status).equal(500);
+          expect(res.body.msg).equal('Internal Server Error');
+          done();
+        });
+    });
+  });
 });

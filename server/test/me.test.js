@@ -27,25 +27,9 @@ describe('GET /account/me/', () => {
     findOneUserStub.restore();
   });
 
-  it('error when check JWT', (done) => {
-    connect.returns(null);
-    findOneUserStub.yields({ error: 'err' });
-    request(app)
-      .get('/account/me')
-      .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
-  });
-
   it('failed connect to blockchain', (done) => {
     connect.returns(null);
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
-    });
+
     request(app)
       .get('/account/me')
       .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -65,11 +49,6 @@ describe('GET /account/me/', () => {
       user: { username: 'hoangdd', role: USER_ROLES.TEACHER }
     });
 
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.TEACHER
-    });
-
     query.returns({ success: false, msg: 'Error' });
 
     request(app)
@@ -85,11 +64,6 @@ describe('GET /account/me/', () => {
 
   it('failed to query info student in chaincode', (done) => {
     connect.returns(null);
-
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.TEACHER
-    });
 
     query.returns({ success: false, msg: 'Error' });
 
@@ -107,10 +81,7 @@ describe('GET /account/me/', () => {
   it('success query info of user student', (done) => {
     query.withArgs('QueryStudent');
     connect.returns({ error: null });
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
-    });
+
     query.returns({
       success: true,
       msg: {
@@ -132,10 +103,7 @@ describe('GET /account/me/', () => {
   it('success query info of user teacher', (done) => {
     query.withArgs('QueryTeacher');
     connect.returns({ error: null });
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.TEACHER
-    });
+
     query.returns({
       success: true,
       msg: {
@@ -156,10 +124,7 @@ describe('GET /account/me/', () => {
 
   it('success query info of admin academy', (done) => {
     connect.returns({ error: null });
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.ADMIN_ACADEMY
-    });
+
     request(app)
       .get('/account/me')
       .set('authorization', `${process.env.JWT_ADMIN_ACADEMY_EXAMPLE}`)
@@ -174,10 +139,7 @@ describe('GET /account/me/', () => {
 
   it('success query info of admin student', (done) => {
     connect.returns({ error: null });
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.ADMIN_STUDENT
-    });
+
     request(app)
       .get('/account/me')
       .set('authorization', `${process.env.JWT_ADMIN_STUDENT_EXAMPLE}`)
@@ -208,25 +170,9 @@ describe('GET /account/me/mysubjects', () => {
     findOneUserStub.restore();
   });
 
-  it('error when check JWT', (done) => {
-    connect.returns(null);
-    findOneUserStub.yields({ error: 'err' });
-    request(app)
-      .get('/account/me/mysubjects')
-      .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
-  });
-
   it('failed connect to blockchain', (done) => {
     connect.returns(null);
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
-    });
+
     request(app)
       .get('/account/me/mysubjects')
       .set('authorization', `${process.env.JWT_STUDENT_EXAMPLE}`)
@@ -239,11 +185,6 @@ describe('GET /account/me/mysubjects', () => {
   });
 
   it('failed to query subject of user student in chaincode', (done) => {
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
-    });
-
     connect.returns({
       contract: 'academy',
       network: 'certificatechannel',
@@ -325,11 +266,6 @@ describe('GET /account/me/mysubjects', () => {
       network: 'certificatechannel',
       gateway: 'gateway',
       user: { username: 'hoangdd', role: USER_ROLES.STUDENT }
-    });
-
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
     });
 
     let data = JSON.stringify({
@@ -432,24 +368,6 @@ describe('POST /account/me/createscore', () => {
     connect.restore();
     createScoreStub.restore();
     findOneUserStub.restore();
-  });
-
-  it('error when check JWT', (done) => {
-    connect.returns(null);
-    findOneUserStub.yields({ error: 'err' });
-    request(app)
-      .post('/account/me/createscore')
-      .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
-      .send({
-        subjectID: '123',
-        studentUsername: 'tantrinh',
-        scoreValue: '9.0'
-      })
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
   });
 
   it('success create score', (done) => {
@@ -565,30 +483,12 @@ describe('GET /account/me/certificates', () => {
     findOneUserStub.restore();
   });
 
-  it('error when check JWT', (done) => {
-    connect.returns(null);
-    findOneUserStub.yields({ error: 'err' });
-    request(app)
-      .post('/account/me/certificates')
-      .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
-  });
-
   it('success query certificates of user student', (done) => {
     connect.returns({
       contract: 'academy',
       network: 'certificatechannel',
       gateway: 'gateway',
       user: { username: 'hoangdd', role: USER_ROLES.STUDENT }
-    });
-
-    findOneUserStub.yields(undefined, {
-      username: 'hoangdd',
-      role: USER_ROLES.STUDENT
     });
 
     let data = JSON.stringify({
@@ -677,22 +577,6 @@ describe('POST /account/me/registersubject', () => {
     connect.restore();
     registerSubjectStub.restore();
     findOneUserStub.restore();
-  });
-
-  it('error when check JWT', (done) => {
-    connect.returns(null);
-    findOneUserStub.yields({ error: 'err' });
-    request(app)
-      .post('/account/me/registersubject')
-      .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
-      .send({
-        subjectId: '123'
-      })
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
   });
 
   it('do not succes with rep.body.subjectId is null', (done) => {
@@ -817,18 +701,6 @@ describe('GET /account/me/:subjectId/students', () => {
     connect.restore();
     query.restore();
     findOneStub.restore();
-  });
-
-  it('error when check JWT', (done) => {
-    findOneStub.yields({ error: 'err' }, null);
-    request(app)
-      .get(`/account/me/${subjectID}/students`)
-      .set('authorization', `${process.env.JWT_TEACHER_EXAMPLE}`)
-      .then((res) => {
-        expect(res.status).equal(403);
-        expect(res.body.success).equal(false);
-        done();
-      });
   });
 
   it('success query students of subject', (done) => {

@@ -5,7 +5,7 @@ const path = require('path');
 const conn = require('../fabric/network');
 const User = require('../models/User');
 const USER_ROLES = require('../configs/constant').USER_ROLES;
-const Certificate = require('../models/Certificate');
+const uuidv4 = require('uuid/v4');
 
 /**
  * Invoke function of chaincode
@@ -16,7 +16,7 @@ const Certificate = require('../models/Certificate');
 
 async function main() {
   try {
-    if (!argv.func || !argv.admin) {
+    if (!argv.func || !argv.username) {
       console.log(`Parameter func or userid cannot undefined`);
       return;
     }
@@ -38,9 +38,46 @@ async function main() {
 
           let SubjectID = argv.subjectid.toString();
           let Name = argv.subjectname.toString();
+
+          let subject = { subjectID: SubjectID, subjectName: Name };
+
+          await conn.createSubject(networkObj, subject);
+          console.log('Transaction has been submitted');
+          process.exit(0);
+        } else if (functionName === 'CreateCertificate' && user.role === USER_ROLES.ADMIN_ACADEMY) {
+          /**
+           * Create Certificate
+           * @param  {String} subjectid Subject Id (required)
+           * @param  {String} student Student Username (required)
+           */
+          let Student = argv.student.toString();
+          let SubjectID = argv.subjectid.toString();
+          var issueDate = new Date().toString();
+          let certificate = {
+            certificateID: uuidv4(),
+            subjectID: SubjectID,
+            studentUsername: Student,
+            issueDate: issueDate
+          };
+          await conn.createCertificate(networkObj, certificate);
+          console.log('Transaction has been submitted 1');
+
+          process.exit(0);
+        } else if (
+          functionName === 'TeacherRegisterSubject' &&
+          user.role === USER_ROLES.ADMIN_ACADEMY
+        ) {
+          let SubjectID = argv.subjectid.toString();
           let Teacher = argv.teacher.toString();
 
-          await conn.createSubject(networkObj, SubjectID, Name, Teacher);
+          await conn.registerTeacherForSubject(networkObj, SubjectID, Teacher);
+          console.log('Transaction has been submitted');
+          process.exit(0);
+        } else if (functionName === 'StudentRegisterSubject' && user.role === USER_ROLES.STUDENT) {
+          let SubjectID = argv.subjectid.toString();
+          let Student = user.username;
+
+          await conn.registerStudentForSubject(networkObj, SubjectID, Student);
           console.log('Transaction has been submitted');
           process.exit(0);
         } else if (functionName === 'CreateScore' && user.role === USER_ROLES.TEACHER) {
@@ -53,29 +90,11 @@ async function main() {
            */
           let SubjectID = argv.subjectid.toString();
           let Student = argv.student.toString();
-          let Score = argv.score.toString();
+          let ScoreValue = argv.score.toString();
 
-          await conn.createScore(networkObj, SubjectID, Student, Score);
+          let score = { subjectID: SubjectID, studentUsername: Student, scoreValue: ScoreValue };
+          await conn.createScore(networkObj, score);
           console.log('Transaction has been submitted');
-          process.exit(0);
-        } else if (functionName === 'CreateCertificate' && user.role === USER_ROLES.ADMIN_ACADEMY) {
-          /**
-           * Create Certificate
-           * @param  {String} subjectid Subject Id (required)
-           * @param  {String} student Student Username (required)
-           */
-          let Student = argv.student.toString();
-          let SubjectID = argv.subjectid.toString();
-          var certificate = new Certificate({
-            subjectID: SubjectID,
-            username: Student
-          });
-
-          await certificate.save(async (err, certificate) => {
-            certificate.certificateID = certificate._id;
-            await conn.createCertificate(networkObj, certificate);
-            console.log('Transaction has been submitted');
-          });
           process.exit(0);
         } else {
           console.log('Failed!');

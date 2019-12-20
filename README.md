@@ -10,7 +10,15 @@
 
 ## Setup network và cài đặt chaicode
 
+### Pull Docker Image
+
+```bash
+curl -sSL http://bit.ly/2ysbOFE | bash -s -- 1.4.4 1.4.4 0.4.18
+```
+
+```bash
 cd network
+```
 
 Làm theo hướng dẫn trong README.md trong folder network
 
