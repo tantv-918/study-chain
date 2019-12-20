@@ -21,7 +21,7 @@ services:
       service: orderer-base
     container_name: orderer2.certificate.com
     networks:
-      - bcertificateyfn
+      - certificate
     volumes:
       - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
       - ./crypto-config/ordererOrganizations/certificate.com/orderers/orderer2.certificate.com/msp:/var/hyperledger/orderer/msp
