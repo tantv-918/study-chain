@@ -14,10 +14,7 @@
   "organizations": {
     "Academy": {
       "mspid": "AcademyMSP",
-      "peers": [
-				"peer0.academy.certificate.com",
-				"peer1.academy.certificate.com"
-      ],
+      "peers": ["peer0.academy.certificate.com", "peer1.academy.certificate.com"],
       "certificateAuthorities": ["ca.academy.certificate.com"]
     }
   },
@@ -46,7 +43,7 @@
   "certificateAuthorities": {
     "ca.academy.certificate.com": {
       "url": "https://localhost:7054",
-      "caName": "ca.academy.certificate.com",
+      "caName": "ACADEMYCA",
       "tlsCACerts": {
         "pem": "-----BEGIN CERTIFICATE-----\nMIICcDCCAhagAwIBAgIRALqmfgyG7uwVokQz9wZdnnwwCgYIKoZIzj0EAwIwgYEx\nCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlhMRYwFAYDVQQHEw1TYW4g\nRnJhbmNpc2NvMSAwHgYDVQQKExdhY2FkZW15LmNlcnRpZmljYXRlLmNvbTEjMCEG\nA1UEAxMaY2EuYWNhZGVteS5jZXJ0aWZpY2F0ZS5jb20wHhcNMjAwMTAzMDcwNjAw\nWhcNMjkxMjMxMDcwNjAwWjCBgTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlm\nb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY2lzY28xIDAeBgNVBAoTF2FjYWRlbXku\nY2VydGlmaWNhdGUuY29tMSMwIQYDVQQDExpjYS5hY2FkZW15LmNlcnRpZmljYXRl\nLmNvbTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABMnR5fqUcKCMlYNG458WCc1t\nfKIRpT5aPzqwSot+wSBbqOP8ROeAiG+uyD0WaE/b8r2lQ0JgDkFYfUcrFZYxL9uj\nbTBrMA4GA1UdDwEB/wQEAwIBpjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUH\nAwEwDwYDVR0TAQH/BAUwAwEB/zApBgNVHQ4EIgQghpcgcpKHwdojE54ObfglHqKz\nSato0c8QN5Sg+W3dKDYwCgYIKoZIzj0EAwIDSAAwRQIhAPc4N7phT0dliVr8rRO1\n6x85HAFSPgH6Kw6ufHvWnPwOAiADyT4qJV3Bi6WDZVB6QxQzUmY1ISneRipRolhM\nFg+rBQ==\n-----END CERTIFICATE-----\n"
       },

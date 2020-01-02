@@ -35,7 +35,7 @@ async function main() {
 
     let nameMSP = await changeCaseFirstLetter(orgMSP);
 
-    const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}.json`);
+    const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}-k8s.json`);
 
     const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
     const ccp = JSON.parse(ccpJSON);

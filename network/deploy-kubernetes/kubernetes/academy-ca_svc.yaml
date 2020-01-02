@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ClusterIP
+metadata:
+  name: academy-ca
+  labels:
+    run: academy-ca
+spec:
+  type: ClusterIP
+  selector:
+    app: academy-ca
+  ports:
+    - protocol: TCP
+      port: 30054
+      targetPort: 7054
+      name: grpc
+    - protocol: TCP
+      port: 7054
+      name: grpc1

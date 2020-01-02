@@ -20,7 +20,7 @@
   "channels": {
     "certificatechannel": {
       "peers": {
-        "peer0.academy.certificate.com": {}
+        "certificate-academypeer0": {}
       },
       "connection": {
         "timeout": {
@@ -38,22 +38,22 @@
       "mspid": "AcademyMSP",
       "fullpath": true,
       "adminPrivateKey": {
-        "path": "../network/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/keystore/b7161711a593ce92d52fae12d37bf493c2e2d63424db530e7052a8868ba90dd4_sk"
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/keystore/51967fc467db79140852afd478df0acaf40cd90f6f17f1b064a846f70d3873c9_sk"
       },
       "signedCert": {
-        "path": "../network/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/signcerts/Admin@academy.certificate.com-cert.pem"
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/signcerts/Admin@academy.certificate.com-cert.pem"
       }
     }
   },
   "peers": {
-    "peer0.academy.certificate.com": {
+    "certificate-academypeer0": {
       "tlsCACerts": {
-        "path": "../network/crypto-config/peerOrganizations/academy.certificate.com/peers/peer0.academy.certificate.com/tls/ca.crt"
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/peers/peer0.academy.certificate.com/tls/ca.crt"
       },
-      "url": "grpc://localhost:7051",
-      "eventUrl": "grpc://localhost:7053",
+      "url": "grpc://certificate-academypeer0:30110",
+      "eventUrl": "grpc://certificate-academypeer0:30110",
       "grpcOptions": {
-        "ssl-target-name-override": "peer0.academy.certificate.com"
+        "ssl-target-name-override": "certificate-academypeer0:30110"
       }
     }
   }

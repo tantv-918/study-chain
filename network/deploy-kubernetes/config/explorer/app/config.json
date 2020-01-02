@@ -1,0 +1,58 @@
+{
+  "name": "certificate-verify",
+  "version": "1.0.0",
+  "client": {
+    "tlsEnable": false,
+    "adminUser": "admin",
+    "adminPassword": "adminpw",
+    "organization": "AcademyMSP",
+    "enableAuthentication": false,
+    "channel": "certificatechannel"
+  },
+  "channels": {
+    "certificatechannel": {
+      "peers": {
+        "certificate-academypeer0": {}
+      },
+      "connection": {
+        "timeout": {
+          "peer": {
+            "endorser": "6000",
+            "eventHub": "6000",
+            "eventReg": "6000"
+          }
+        }
+      }
+    }
+  },
+  "organizations": {
+    "AcademyMSP": {
+      "mspid": "AcademyMSP",
+      "fullpath": false,
+      "adminPrivateKey": {
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/keystore/51967fc467db79140852afd478df0acaf40cd90f6f17f1b064a846f70d3873c9_sk"
+      },
+      "signedCert": {
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/users/Admin@academy.certificate.com/msp/signcerts/Admin@academy.certificate.com-cert.pem"
+      }
+    }
+  },
+  "peers": {
+    "certificate-academypeer0": {
+      "tlsCACerts": {
+        "path": "/fabric/crypto-config/peerOrganizations/academy.certificate.com/peers/peer0.academy.certificate.com/tls/ca.crt"
+      },
+      "url": "grpc://certificate-academypeer0:30110",
+      "eventUrl": "grpc://certificate-academypeer0:30111",
+      "grpcOptions": {
+        "ssl-target-name-override": "certificate-academypeer0:30110"
+      }
+    }
+  },
+  "orderers": {
+    "certificate-orderer": {
+      "url": "grpc://certificate-orderer:31010"
+    }
+  },
+  "license": "Apache-2.0"
+}
