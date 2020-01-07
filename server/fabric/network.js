@@ -40,10 +40,10 @@ exports.connectToNetwork = async function(user, cli = false) {
     let identity = user.username;
 
     const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}.json`);
-    let walletPath = path.join(process.cwd(), `cli/wallet-${orgMSP}`);
+    let walletPath = path.join(process.cwd(), `/cli/wallet/wallet-${orgMSP}`);
 
     if (cli) {
-      walletPath = path.join(process.cwd(), `/wallet-${orgMSP}`);
+      walletPath = path.join(process.cwd(), `/wallet/wallet-${orgMSP}`);
     }
 
     const wallet = new FileSystemWallet(walletPath);
@@ -66,7 +66,7 @@ exports.connectToNetwork = async function(user, cli = false) {
       await gateway.connect(ccpPath, {
         wallet: wallet,
         identity: identity,
-        discovery: { enabled: true, asLocalhost: true }
+        discovery: { enabled: true, asLocalhost: false }
       });
 
       const network = await gateway.getNetwork('certificatechannel');
@@ -154,7 +154,7 @@ exports.registerTeacherOnBlockchain = async function(networkObj, createdUser) {
 
   try {
     const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}.json`);
-    const walletPath = path.join(process.cwd(), `/cli/wallet-${orgMSP}`);
+    const walletPath = path.join(process.cwd(), `/cli/wallet/wallet-${orgMSP}`);
     const wallet = new FileSystemWallet(walletPath);
 
     const userExists = await wallet.exists(createdUser.username);
@@ -231,7 +231,7 @@ exports.registerStudentOnBlockchain = async function(createdUser) {
 
   try {
     const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}.json`);
-    const walletPath = path.join(process.cwd(), `/cli/wallet-${orgMSP}`);
+    const walletPath = path.join(process.cwd(), `/cli/wallet/wallet-${orgMSP}`);
     const wallet = new FileSystemWallet(walletPath);
 
     const userExists = await wallet.exists(identity);
@@ -248,7 +248,7 @@ exports.registerStudentOnBlockchain = async function(createdUser) {
     await gateway.connect(ccpPath, {
       wallet,
       identity: process.env.ADMIN_STUDENT_USERNAME,
-      discovery: { enabled: true, asLocalhost: true }
+      discovery: { enabled: true, asLocalhost: false }
     });
 
     // Get the CA client object from the gateway for interacting with the CA.

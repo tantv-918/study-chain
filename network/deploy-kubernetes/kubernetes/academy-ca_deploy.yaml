@@ -30,7 +30,7 @@ spec:
             - name: TZ
               value: 'America/Sao_Paulo'
             - name: FABRIC_CA_SERVER_CA_NAME
-              value: 'ACADEMYCA'
+              value: 'ca.academy.certificate.com'
             - name: FABRIC_CA_SERVER_DEBUG
               value: 'true'
             - name: FABRIC_CA_SERVER_TLS_ENABLED
@@ -38,11 +38,11 @@ spec:
             - name: FABRIC_CA_SERVER_CA_CERTFILE
               value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/ca.academy.certificate.com-cert.pem
             - name: FABRIC_CA_SERVER_CA_KEYFILE
-              value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/acb246524aad5900f52cf65443d4f859262ad3960395f6fb50bdb6c1888f3be9_sk
+              value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/62b1c120285493236a09a5ad3416f386d7e8f07a787e93f79f2c542037ace904_sk
             - name: FABRIC_CA_SERVER_TLS_CERTFILE
               value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/ca.academy.certificate.com-cert.pem
             - name: FABRIC_CA_SERVER_TLS_KEYFILE
-              value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/acb246524aad5900f52cf65443d4f859262ad3960395f6fb50bdb6c1888f3be9_sk
+              value: /fabric/crypto-config/peerOrganizations/academy.certificate.com/ca/62b1c120285493236a09a5ad3416f386d7e8f07a787e93f79f2c542037ace904_sk
             - name: GODEBUG
               value: 'netdns=go'
           volumeMounts:

@@ -18,6 +18,10 @@ kubectl apply -f kubernetes/backup-studentpeer1-pv.yaml
 
 kubectl apply -f kubernetes/backup-studentpeer1-pvc.yaml
 
+kubectl apply -f kubernetes/backup-server-pv.yaml
+
+kubectl apply -f kubernetes/backup-server-pvc.yaml
+
 kubectl apply -f kubernetes/fabric-tools.yaml
 
 kubectl exec -it fabric-tools -- mkdir /fabric/config
@@ -27,6 +31,8 @@ kubectl cp config/configtx.yaml fabric-tools:/fabric/config/
 kubectl cp config/crypto-config.yaml fabric-tools:/fabric/config/
 
 kubectl cp config/chaincode/ fabric-tools:/fabric/config/
+
+kubectl cp config/server fabric-tools:/fabric/config/
 
 kubectl exec -it fabric-tools -- mkdir -p /opt/gopath/src/github.com/hyperledger
 
@@ -57,11 +63,20 @@ configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate StudentMSPanchors.t
 exit
 
 kubectl exec -it fabric-tools -- /bin/bash
+cd /fabric/config/server
+./ccp-generate.sh
+exit
+
+
+kubectl exec -it fabric-tools -- /bin/bash
 chmod a+rx /fabric/* -R
 exit
 
 kubectl apply -f kubernetes/academy-ca_deploy.yaml
 kubectl apply -f kubernetes/academy-ca_svc.yaml
+
+kubectl apply -f kubernetes/server_deploy.yaml
+kubectl apply -f kubernetes/server_svc.yaml
 
 kubectl apply -f kubernetes/student-ca_deploy.yaml
 kubectl apply -f kubernetes/student-ca_svc.yaml

@@ -56,6 +56,10 @@ app.use('/subject', checkJWT, subjectRoutes);
 app.use('/score', checkJWT, scoreRoutes);
 app.use('/certificate', certificateRoutes);
 app.use('/account/me', checkJWT, meRoutes);
+app.get('/hello', (req, res) => {
+  res.writeHead(200);
+  res.end('Hello World');
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -1,11 +1,14 @@
-FROM node:8
+FROM node:10
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install
 COPY . .
 
-EXPOSE 3000
-CMD [ "npm", "start" ]
+# RUN npm install
+
+# Development
+# CMD ["npm", "start"]
+
+# Production
+RUN npm install -g pm2
+CMD ["pm2-runtime", "./bin/www"]
