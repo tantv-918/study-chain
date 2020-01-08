@@ -147,7 +147,7 @@ instantiateChaincode() {
   # the "-o" option
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer chaincode instantiate -o orderer.certificate.com:7050 -C $CHANNEL_NAME -n academy -l ${LANGUAGE} -v ${VERSION} -c '{"Args":[]}' -P "OR ('AcademyMSP.peer','StudentMSP.peer')" >&log.txt
+    peer chaincode instantiate -o orderer.certificate.com:7050 -C $CHANNEL_NAME -n academy -l ${LANGUAGE} -v ${VERSION} -c '{"Args":[]}' -P "AND ('AcademyMSP.peer','StudentMSP.peer')" >&log.txt
     res=$?
     set +x
   else

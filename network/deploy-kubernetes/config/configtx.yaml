@@ -1,0 +1,138 @@
+---
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/certificate.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+  - &Academy
+    Name: AcademyMSP
+    ID: AcademyMSP
+    MSPDir: crypto-config/peerOrganizations/academy.certificate.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('AcademyMSP.admin', 'AcademyMSP.peer', 'AcademyMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('AcademyMSP.admin', 'AcademyMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('AcademyMSP.admin')"
+    AnchorPeers:
+      - Host: certificate-academypeer0
+        Port: 30110
+  - &Student
+    Name: StudentMSP
+    ID: StudentMSP
+    MSPDir: crypto-config/peerOrganizations/student.certificate.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('StudentMSP.admin', 'StudentMSP.peer', 'StudentMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('StudentMSP.admin', 'StudentMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('StudentMSP.admin')"
+    AnchorPeers:
+      - Host: certificate-studentpeer0
+        Port: 30110
+Capabilities:
+  Channel: &ChannelCapabilities
+    V1_4_3: true
+    V1_3: false
+    V1_1: false
+  Orderer: &OrdererCapabilities
+    V1_4_2: true
+    V1_1: false
+  Application: &ApplicationCapabilities
+    V1_4_2: true
+    V1_3: false
+    V1_2: false
+    V1_1: false
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+  Capabilities:
+    <<: *ApplicationCapabilities
+Orderer: &OrdererDefaults
+  OrdererType: solo
+
+  Addresses:
+    - certificate-orderer:31010
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: 'ANY Readers'
+    Writers:
+      Type: ImplicitMeta
+      Rule: 'ANY Writers'
+    Admins:
+      Type: ImplicitMeta
+      Rule: 'MAJORITY Admins'
+  Capabilities:
+    <<: *ChannelCapabilities
+Profiles:
+  TwoOrgsOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities:
+        <<: *OrdererCapabilities
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          - *Academy
+          - *Student
+  TwoOrgsChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *Academy
+        - *Student
+      Capabilities:
+        <<: *ApplicationCapabilities

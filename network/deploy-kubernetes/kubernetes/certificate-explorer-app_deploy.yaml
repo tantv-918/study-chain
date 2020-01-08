@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: certificate-explorer-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: explorer
+  template:
+    metadata:
+      labels:
+        app: explorer
+    spec:
+      volumes:
+        - name: fabricfiles
+          persistentVolumeClaim:
+            claimName: fabric-pvc
+      containers:
+        - name: explorer
+          image: hyperledger/explorer:latest
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', '/fabric/config/blockchain-explorer/start.sh']
+          env:
+            - name: TZ
+              value: 'America/Sao_Paulo'
+            - name: DATABASE_HOST
+              value: certificate-explorer-db
+            - name: DATABASE_USERNAME
+              value: hppoc
+            - name: DATABASE_PASSWORD
+              value: password
+          volumeMounts:
+            - mountPath: /fabric
+              name: fabricfiles
+          ports:
+            - containerPort: 8080

@@ -67,7 +67,7 @@ async function main() {
     const ccpPath = path.resolve(__dirname, '../..', 'network', `connection-${orgMSP}.json`);
 
     // Create a new file system based wallet for managing identities.
-    const walletPath = path.join(process.cwd(), `wallet-${orgMSP}`);
+    const walletPath = path.join(process.cwd(), `/wallet/wallet-${orgMSP}`);
     const wallet = new FileSystemWallet(walletPath);
 
     // Check to see if we've already enrolled the user.
@@ -90,7 +90,7 @@ async function main() {
     await gateway.connect(ccpPath, {
       wallet,
       identity: admin,
-      discovery: { enabled: true, asLocalhost: true }
+      discovery: { enabled: true, asLocalhost: false }
     });
 
     // Get the CA client object from the gateway for interacting with the CA.

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      volumes:
+        - name: fabricfiles
+          persistentVolumeClaim:
+            claimName: fabric-pvc
+        - name: serverfiles
+          persistentVolumeClaim:
+            claimName: server-pvc
+      containers:
+        - name: server
+          image: study-chain-server
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: mongodb://165.22.191.114:27017/certificate
+            - name: EXPRESS_SESSION
+              value: 'hahaha'
+            - name: SECRET_JWT
+              value: 'sunasteriskvietnamblockchainteamcertificate'
+            - name: NODE_ENV
+              value: test
+            - name: ADMIN_ACADEMY_USERNAME
+              value: adminacademy
+            - name: ADMIN_ACADEMY_PASSWORD
+              value: academy
+            - name: ADMIN_STUDENT_USERNAME
+              value: adminstudent
+            - name: ADMIN_STUDENT_PASSWORD
+              value: student
+            - name: TEACHER_DEFAULT_PASSWORD
+              value: '123456'
+            - name: GOOGLE_CLIENT_ID
+              value: '310888892418-vtum0im1angbkhe5i4t0ns3o9mhi926o.apps.googleusercontent.com'
+            - name: GOOGLE_CLIENT_SECRET
+              value: '-SS3ylFup2-E4ZJD3TNM_iNF'
+            - name: GOOGLE_CALLBACK_URL
+              value: 'http://localhost:3000/auth/google/callback/'
+            - name: FACEBOOK_APP_ID
+              value: '2515749878509352'
+            - name: FACEBOOK_APP_SECRET
+              value: '34fd634d9f662f0bfb9f77d34e2287ca'
+            - name: FACEBOOK_CALLBACK
+              value: 'http://localhost:3000/auth/facebook/callback/'
+          volumeMounts:
+            - mountPath: /network
+              name: fabricfiles
+            - mountPath: /app/cli/wallet
+              name: serverfiles

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-version: "2"
+version: '2'
 
 services:
   orderer.certificate.com:
@@ -37,7 +37,7 @@ services:
       - /var/run/:/host/var/run/
       - ../crypto-config/peerOrganizations/academy.certificate.com/peers/peer0.academy.certificate.com/msp:/etc/hyperledger/fabric/msp
       - ../crypto-config/peerOrganizations/academy.certificate.com/peers/peer0.academy.certificate.com/tls:/etc/hyperledger/fabric/tls
-      - peer0.academy.certificate.com:/var/hyperledger/production
+      - peer0.academy.certificate.com:/var/hyperledger/production/
     ports:
       - 7051:7051
 
