@@ -75,9 +75,6 @@ exit
 kubectl apply -f kubernetes/academy-ca_deploy.yaml
 kubectl apply -f kubernetes/academy-ca_svc.yaml
 
-kubectl apply -f kubernetes/server_deploy.yaml
-kubectl apply -f kubernetes/server_svc.yaml
-
 kubectl apply -f kubernetes/student-ca_deploy.yaml
 kubectl apply -f kubernetes/student-ca_svc.yaml
 
@@ -93,6 +90,11 @@ kubectl apply -f kubernetes/studentpeer0_deploy.yaml
 kubectl apply -f kubernetes/studentpeer1_deploy.yaml
 kubectl apply -f kubernetes/studentpeer0_svc.yaml
 kubectl apply -f kubernetes/studentpeer1_svc.yaml
+
+kubectl apply -f kubernetes/server_deploy.yaml
+kubectl apply -f kubernetes/server_svc.yaml
+
+kubectl apply -f kubernetes/mongo.yaml
 
 kubectl exec -it fabric-tools -- /bin/bash
 cd /fabric

@@ -7,18 +7,20 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 256Mi
+      storage: 4Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mongo
 spec:
+  type: NodePort
   selector:
     app: mongo
   ports:
     - port: 27017
       targetPort: 27017
+      nodePort: 30001
 ---
 apiVersion: apps/v1
 kind: Deployment
