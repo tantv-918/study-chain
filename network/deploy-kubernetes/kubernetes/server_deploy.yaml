@@ -21,43 +21,56 @@ spec:
             claimName: server-pvc
       containers:
         - name: server
-          image: study-chain-server
+          image: conglt/study-chain-server
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
           env:
             - name: MONGODB_URI
-              # value: mongodb://165.22.191.114:27017/certificate
-              # value: mongodb://192.168.99.103:27017/certificate
-              value: mongodb://mongo:27017/studychain
-            - name: NODE_ENV
-              value: 'production'
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: MONGODB_URI
+            - name: MONGODB_CONTAINER
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: MONGODB_CONTAINER
             - name: SECRET_JWT
-              value: 'sunasteriskvietnamblockchainteamcertificate'
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: SECRET_JWT
             - name: NODE_ENV
-              value: test
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: NODE_ENV
             - name: ADMIN_ACADEMY_USERNAME
-              value: adminacademy
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: ADMIN_ACADEMY_USERNAME
             - name: ADMIN_ACADEMY_PASSWORD
-              value: academy
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: ADMIN_ACADEMY_PASSWORD
             - name: ADMIN_STUDENT_USERNAME
-              value: adminstudent
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: ADMIN_STUDENT_USERNAME
             - name: ADMIN_STUDENT_PASSWORD
-              value: student
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: ADMIN_STUDENT_PASSWORD
             - name: TEACHER_DEFAULT_PASSWORD
-              value: '123456'
-            - name: GOOGLE_CLIENT_ID
-              value: '310888892418-vtum0im1angbkhe5i4t0ns3o9mhi926o.apps.googleusercontent.com'
-            - name: GOOGLE_CLIENT_SECRET
-              value: '-SS3ylFup2-E4ZJD3TNM_iNF'
-            - name: GOOGLE_CALLBACK_URL
-              value: 'http://localhost:3000/auth/google/callback/'
-            - name: FACEBOOK_APP_ID
-              value: '2515749878509352'
-            - name: FACEBOOK_APP_SECRET
-              value: '34fd634d9f662f0bfb9f77d34e2287ca'
-            - name: FACEBOOK_CALLBACK
-              value: 'http://localhost:3000/auth/facebook/callback/'
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: TEACHER_DEFAULT_PASSWORD
           volumeMounts:
             - mountPath: /network
               name: fabricfiles
