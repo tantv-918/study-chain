@@ -27,9 +27,11 @@ spec:
             - containerPort: 3000
           env:
             - name: MONGODB_URI
-              value: mongodb://165.22.191.114:27017/certificate
-            - name: EXPRESS_SESSION
-              value: 'hahaha'
+              # value: mongodb://165.22.191.114:27017/certificate
+              # value: mongodb://192.168.99.103:27017/certificate
+              value: mongodb://mongo:27017/studychain
+            - name: NODE_ENV
+              value: 'production'
             - name: SECRET_JWT
               value: 'sunasteriskvietnamblockchainteamcertificate'
             - name: NODE_ENV
