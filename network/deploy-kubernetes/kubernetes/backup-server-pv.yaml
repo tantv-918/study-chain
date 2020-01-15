@@ -7,7 +7,7 @@ metadata:
     name: serverfiles
 spec:
   capacity:
-    storage: 10Gi
+    storage: 2Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany

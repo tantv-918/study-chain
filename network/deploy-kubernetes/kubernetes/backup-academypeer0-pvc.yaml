@@ -7,7 +7,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 10Gi
+      storage: 2Gi
   selector:
     matchLabels:
       name: academypeer0files

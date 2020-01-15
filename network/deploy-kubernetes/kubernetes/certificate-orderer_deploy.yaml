@@ -16,6 +16,9 @@ spec:
         - name: fabricfiles
           persistentVolumeClaim:
             claimName: fabric-pvc
+        - name: ordererfiles
+          persistentVolumeClaim:
+            claimName: orderer-pvc
 
       containers:
         - name: orderer
@@ -78,3 +81,5 @@ spec:
           volumeMounts:
             - mountPath: /fabric
               name: fabricfiles
+            - mountPath: /var/hyperledger/production
+              name: ordererfiles

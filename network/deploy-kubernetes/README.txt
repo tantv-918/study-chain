@@ -18,6 +18,10 @@ kubectl apply -f kubernetes/backup-studentpeer1-pv.yaml
 
 kubectl apply -f kubernetes/backup-studentpeer1-pvc.yaml
 
+kubectl apply -f kubernetes/backup-orderer-pv.yaml
+
+kubectl apply -f kubernetes/backup-orderer-pvc.yaml
+
 kubectl apply -f kubernetes/backup-server-pv.yaml
 
 kubectl apply -f kubernetes/backup-server-pvc.yaml

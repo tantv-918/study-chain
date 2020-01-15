@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: studentpeer0-pvc
+  name: orderer-pvc
 spec:
   accessModes:
     - ReadWriteMany
@@ -10,4 +10,4 @@ spec:
       storage: 2Gi
   selector:
     matchLabels:
-      name: studentpeer0files
+      name: ordererfiles
