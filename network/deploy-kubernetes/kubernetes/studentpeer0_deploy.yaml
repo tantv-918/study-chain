@@ -104,7 +104,7 @@ spec:
             - name: FABRIC_CFG_PATH
               value: /etc/hyperledger/fabric
             - name: ORDERER_URL
-              value: blockchain-orderer:31010
+              value: certificate-orderer:31010
             - name: GODEBUG
               value: 'netdns=go'
             - name: CORE_VM_DOCKER_ATTACHSTDOUT

@@ -1,0 +1,3 @@
+github.com/golang/protobuf v1.3.3 h1:gyjaxf+svBWX08ZjK86iN9geUJF0H6gp2IRKX6Nf6/I=
+github.com/golang/protobuf v1.3.3/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
+github.com/hyperledger/fabric v2.0.0+incompatible h1:i4dFsQlV8jrlARyYLnNmpe2VMext2NW8x7T1Is/p/XQ=

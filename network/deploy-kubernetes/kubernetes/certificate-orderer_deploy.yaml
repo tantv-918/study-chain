@@ -16,6 +16,9 @@ spec:
         - name: fabricfiles
           persistentVolumeClaim:
             claimName: fabric-pvc
+        - name: ordererfiles
+          persistentVolumeClaim:
+            claimName: orderer-pvc
 
       containers:
         - name: orderer
@@ -29,8 +32,8 @@ spec:
               value: /fabric/
             - name: ORDERER_GENERAL_LEDGERTYPE
               value: file
-            - name: ORDERER_FILELEDGER_LOCATION
-              value: /fabric/ledger/orderer
+            # - name: ORDERER_FILELEDGER_LOCATION
+            #   value: /fabric/ledger/orderer
             - name: ORDERER_GENERAL_BATCHTIMEOUT
               value: 1s
             - name: ORDERER_GENERAL_BATCHSIZE_MAXMESSAGECOUNT
@@ -73,8 +76,10 @@ spec:
             #   value: /fabric/crypto-config/ordererOrganizations/certificate.com/orderers/orderer.certificate.com/tls/ca.crt
             - name: GODEBUG
               value: 'netdns=go'
-            - name: ORDERER_GENERAL_LEDGERTYPE
-              value: 'ram'
+            # - name: ORDERER_GENERAL_LEDGERTYPE
+            #   value: 'ram'
           volumeMounts:
             - mountPath: /fabric
               name: fabricfiles
+            - mountPath: /var
+              name: ordererfiles

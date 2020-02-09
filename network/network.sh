@@ -220,8 +220,8 @@ function upgradeNetwork() {
     COMPOSE_FILES="-f ${COMPOSE_FILE}"
     if [ "${CERTIFICATE_AUTHORITIES}" == "true" ]; then
       COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_CA}"
-      export CERTIFICATE_CA1_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/academy.certificate.com/ca && ls *_sk)
-      export CERTIFICATE_CA2_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/Student.certificate.com/ca && ls *_sk)
+      export CERTIFICATE_ACADEMY_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/academy.certificate.com/ca && ls *_sk)
+      export CERTIFICATE_STUDENT_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/Student.certificate.com/ca && ls *_sk)
     fi
     if [ "${CONSENSUS_TYPE}" == "kafka" ]; then
       COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_KAFKA}"

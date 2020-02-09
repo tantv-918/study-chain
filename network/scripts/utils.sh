@@ -112,7 +112,7 @@ joinChannelWithRetry() {
   cat log.txt
   if [ $res -ne 0 -a $COUNTER -lt $MAX_RETRY ]; then
     COUNTER=$(expr $COUNTER + 1)
-    echo "peer${PEER}.org${ORG} failed to join the channel, Retry after $DELAY seconds"
+    echo "${MESS_FOR_PEER} failed to join the channel, Retry after $DELAY seconds"
     sleep $DELAY
     joinChannelWithRetry $PEER $ORG
   else
